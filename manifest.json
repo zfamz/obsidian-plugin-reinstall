@@ -1,6 +1,6 @@
 {
-	"id": "ample-plugin",
-	"name": "ample Plugin",
+	"id": "obsidian-plugin-reinstall",
+	"name": "Plugin Reinstall",
 	"version": "1.4.0",
 	"minAppVersion": "0.1.0",
 	"description": "Demonstrates some of the capabilities of the Obsidian API.",

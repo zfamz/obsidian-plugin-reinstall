@@ -4,11 +4,32 @@ import { grabCommmunityPluginList, getAllReleaseFiles } from "./lib";
 
 export default class ReinstallPlugin extends Plugin {
 	async onload() {
-		this.addRibbonIcon("dice", "Greet", () => {
-			console.log(this.app);
-			new Notice("Hello, world!");
-			// this.savePluginsList();
-			this.updatePluginsFiles();
+		this.addCommand({
+			id: "reinstall-backup",
+			name: "Backup list",
+			callback: () => {
+				this.savePluginsList();
+			},
+		});
+		this.addCommand({
+			id: "reinstall-reinstall",
+			name: "Reinstall",
+			callback: () => {
+				this.updatePluginsFiles();
+			},
+		});
+		this.addCommand({
+			id: "reinstall-show",
+			name: "Show",
+			callback: () => {
+				this.loadData().then((list) => {
+					let str = "";
+					list.map((item: CommunityPlugin) => {
+						str += `${item.name}: ${item.version}\n`;
+					});
+					new Notice(str);
+				});
+			},
 		});
 	}
 
@@ -77,10 +98,6 @@ export default class ReinstallPlugin extends Plugin {
 			this.saveData(data);
 			new Notice("plugins's config saved");
 		}
-	}
-
-	getLocalPlugins() {
-		return new Set(Object.keys((this.app as any).plugins.plugins));
 	}
 
 	onunload() {}
