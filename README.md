@@ -9,11 +9,10 @@ aim to async project with git without the plugin's large file (main.js , styles.
 ```
 /.obsidian/plugins/**/main.js
 /.obsidian/plugins/**/styles.css
-!/.obsidan/plugins/obsidian-plugin-reinstall
 ```
 
 2. download the release files
-3. put it in `/.obsidan/plugins/obsidian-plugin-reinstall` dir
+3. put it in `/.obsidan/plugins` dir
 
 ## Usage
 
