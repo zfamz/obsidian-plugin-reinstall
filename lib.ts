@@ -1,4 +1,3 @@
-import type { PluginManifest } from "obsidian";
 import { request } from "obsidian";
 
 const GITHUB_RAW_USERCONTENT_PATH = "https://raw.githubusercontent.com/";
@@ -31,53 +30,13 @@ export const grabReleaseFileFromRepository = async (
 	}
 };
 
-/**
- * grabs the manifest.json from the repository. rootManifest - if true grabs manifest.json if false grabs manifest-beta.json
- *
- * @param repositoryPath - path to GitHub repository in format USERNAME/repository
- * @param rootManifest   - if true grabs manifest.json if false grabs manifest-beta.json
- *
- * @returns returns manifest file for  a plugin
- */
-export const grabManifestJsonFromRepository = async (
-	repositoryPath: string,
-	rootManifest = true,
-	debugLogging = true
-): Promise<PluginManifest | null> => {
-	const manifestJsonPath =
-		GITHUB_RAW_USERCONTENT_PATH +
-		repositoryPath +
-		(rootManifest ? "/HEAD/manifest.json" : "/HEAD/manifest-beta.json");
-	if (debugLogging)
-		console.log(
-			"grabManifestJsonFromRepository manifestJsonPath",
-			manifestJsonPath
-		);
-	try {
-		const response: string = await request({ url: manifestJsonPath });
-		if (debugLogging)
-			console.log("grabManifestJsonFromRepository response", response);
-		return response === "404: Not Found"
-			? null
-			: ((await JSON.parse(response)) as PluginManifest);
-	} catch (error) {
-		if (error !== "Error: Request failed, status 404" && debugLogging) {
-			// normal error, ignore
-			console.log(
-				`error in grabManifestJsonFromRepository for ${manifestJsonPath}`,
-				error
-			);
-		}
-		return null;
-	}
-};
-
 export interface CommunityPlugin {
 	id: string;
 	name: string;
 	author: string;
 	description: string;
 	repo: string;
+	version?: string;
 }
 
 export const grabCommmunityPluginList = async (
@@ -94,4 +53,43 @@ export const grabCommmunityPluginList = async (
 			console.log("error in grabCommmunityPluginList", error);
 		return null;
 	}
+};
+
+export interface ReleaseFiles {
+	mainJs: string | null;
+	manifest: string | null;
+	styles: string | null;
+}
+
+/**
+ * Gets all the release files based on the version number in the manifest
+ *
+ * @param repositoryPath - path to the GitHub repository
+ * @param manifest       - manifest file
+ * @param getManifest    - grab the remote manifest file
+ * @param specifyVersion - grab the specified version if set
+ *
+ * @returns all relase files as strings based on the ReleaseFiles interaface
+ */
+export const getAllReleaseFiles = async (
+	repositoryPath: string,
+	version: string
+): Promise<ReleaseFiles> => {
+	return {
+		mainJs: await grabReleaseFileFromRepository(
+			repositoryPath,
+			version,
+			"main.js"
+		),
+		manifest: await grabReleaseFileFromRepository(
+			repositoryPath,
+			version,
+			"manifest.json"
+		),
+		styles: await grabReleaseFileFromRepository(
+			repositoryPath,
+			version,
+			"styles.css"
+		),
+	};
 };
